@@ -14,6 +14,7 @@ test.describe('login form tests', () => {
 
     page.locator('button', { hasText: 'Login' }).click()
 
-    await expect(page.getByText('Log out')).toBeVisible({timeout: 1000})
+    await expect(page.getByText(`Welcome ${existingUser.firstName} ${existingUser.lastName}`))
+    .toBeVisible({timeout: 1000})
   })
 })
