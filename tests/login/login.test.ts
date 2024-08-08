@@ -1,29 +1,31 @@
 import { test, expect } from '@playwright/test'
 import { existingUsers } from '../../test-setup/localstorage.setup'
+import { Login as LoginPage } from '../../test-pages/login'
 
 test.describe.configure({ mode: 'serial' })
 
 test.describe('login form tests', () => {
   test('logging in works with existing account', async ({ page }) => {
-    await page.goto('localhost:8080/login')
+    const { email, password, firstName, lastName } = existingUsers[0]
 
-    const existingUser = existingUsers[0]
+    const loginPage = new LoginPage(page);
 
-    await page
-      .locator('#root form div:nth-child(1) > div > input')
-      .pressSequentially(existingUser.email)
+    await loginPage.goto("localhost:8080");
+    await loginPage.enterEmail(email);
+    await loginPage.enterPassword(password);
+    await loginPage.clickLoginButton();
 
-    await page
-      .locator('#root form div:nth-child(2) > div > input')
-      .pressSequentially(existingUser.password)
+    expect(await loginPage.userIsLoggedIn(firstName, lastName)).toBe(true);
+  })
 
-    // Submit button
-    const button = page.locator('form .MuiButton-sizeMedium')
-    // Click on the button
-    button.click()
+  test('fail to login with invalid credentials', async ({ page }) => {
+    const loginPage = new LoginPage(page);
 
-    // Wait for 1 second until page is fully loaded
-    await page.waitForTimeout(1000)
-    await expect(page.getByText('Log out')).toBeVisible()
+    await loginPage.goto("localhost:8080");
+    await loginPage.enterEmail("invalid@example.com");
+    await loginPage.enterPassword("invalidpassword");
+    await loginPage.clickLoginButton();
+
+    expect(await loginPage.isLoggedIn()).toBe(false);
   })
 })
