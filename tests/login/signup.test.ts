@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test'
 import { existingUsers } from '../../test-setup/localstorage.setup'
 import { Signup as SignupPage } from '../../test-pages/signup'
+import { Login as LoginPage } from '../../test-pages/login'
+import { Start as StartPage } from '../../test-pages/start'
 
 test.describe.configure({ mode: 'serial' })
 
@@ -19,6 +21,33 @@ test.describe('signup form tests', () => {
     await signupPage.clickSubmitButton();
 
     expect(await signupPage.userIsLoggedIn(firstName, lastName)).toBe(true);
+  })
+
+  test('can login with newly created account', async ({ page }) => {
+    const email = "new@email.com";
+    const password = "newpassword123";
+
+    const signupPage = new SignupPage(page);
+
+    await signupPage.goto("localhost:8080");
+    await signupPage.enterFirstName("Firstname");
+    await signupPage.enterLastName("Lastname");
+    await signupPage.enterEmail(email);
+    await signupPage.enterPassword(password);
+    await signupPage.clickSubmitButton();
+
+    await (new StartPage(page)).logOut();
+
+    const loginPage = new LoginPage(page);
+
+    await loginPage.goto("localhost:8080");
+    await loginPage.enterEmail(email);
+    await loginPage.enterPassword(password);
+    await loginPage.clickLoginButton();
+
+    expect(await loginPage.isLoggedIn()).toBe(true);
+
+    
   })
 
   test('block signup if no email is entered', async ({ page }) => {
