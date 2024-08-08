@@ -1,20 +1,20 @@
 import { test, expect } from '@playwright/test'
 import { existingUsers } from '../../test-setup/localstorage.setup'
+import { Login as LoginPage } from '../../test-pages/login'
 
 test.describe.configure({ mode: 'serial' })
 
 test.describe('login form tests', () => {
   test('logging in works with existing account', async ({ page }) => {
-    await page.goto('localhost:8080/login')
+    const { email, password, firstName, lastName } = existingUsers[0]
 
-    const existingUser = existingUsers[0]
+    const loginPage = new LoginPage(page);
 
-    await page.getByLabel(`Email`).fill(existingUser.email)
-    await page.getByLabel(`Password`).nth(0).fill(existingUser.password)
+    await loginPage.goto("localhost:8080");
+    await loginPage.enterEmail(email);
+    await loginPage.enterPassword(password);
+    await loginPage.clickLoginButton();
 
-    page.locator('button', { hasText: 'Login' }).click()
-
-    await expect(page.getByText(`Welcome ${existingUser.firstName} ${existingUser.lastName}`))
-    .toBeVisible({timeout: 1000})
+    expect(await loginPage.userIsLoggedIn(firstName, lastName)).toBe(true);
   })
 })
