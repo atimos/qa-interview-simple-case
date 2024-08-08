@@ -9,21 +9,11 @@ test.describe('login form tests', () => {
 
     const existingUser = existingUsers[0]
 
-    await page
-      .locator('#root form div:nth-child(1) > div > input')
-      .pressSequentially(existingUser.email)
+    await page.getByLabel(`Email`).fill(existingUser.email)
+    await page.getByLabel(`Password`).nth(0).fill(existingUser.password)
 
-    await page
-      .locator('#root form div:nth-child(2) > div > input')
-      .pressSequentially(existingUser.password)
+    page.locator('button', { hasText: 'Login' }).click()
 
-    // Submit button
-    const button = page.locator('form .MuiButton-sizeMedium')
-    // Click on the button
-    button.click()
-
-    // Wait for 1 second until page is fully loaded
-    await page.waitForTimeout(1000)
-    await expect(page.getByText('Log out')).toBeVisible()
+    await expect(page.getByText('Log out')).toBeVisible({timeout: 1000})
   })
 })
