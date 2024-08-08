@@ -17,4 +17,15 @@ test.describe('login form tests', () => {
 
     expect(await loginPage.userIsLoggedIn(firstName, lastName)).toBe(true);
   })
+
+  test('fail to login with invalid credentials', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+
+    await loginPage.goto("localhost:8080");
+    await loginPage.enterEmail("invalid@example.com");
+    await loginPage.enterPassword("invalidpassword");
+    await loginPage.clickLoginButton();
+
+    expect(await loginPage.isLoggedIn()).toBe(false);
+  })
 })
