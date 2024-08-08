@@ -31,7 +31,7 @@ export class Login {
 
   async isLoggedIn() {
     try {
-      await page.locator('button', { hasText: 'Log out' }).waitFor({timeout: 1000});
+      await this.page.locator('button', { hasText: 'Log out' }).waitFor({timeout: 1000});
       return true;
     } catch {
       return false;
@@ -40,7 +40,9 @@ export class Login {
 
   async userIsLoggedIn(firstName, lastName) {
     try {
-      await this.isLoggedIn();
+      if (await this.isLoggedIn() == false) {
+        return false;
+      }
       await this.page.getByText(`Welcome ${firstName} ${lastName}`).waitFor({timeout: 1000})
       return true;
     } catch {
