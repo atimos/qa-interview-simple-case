@@ -1,16 +1,19 @@
-import { expect, type Locator, type Page } from '@playwright/test';
+import { type Locator, type Page } from '@playwright/test';
+import { Login as LoginComponent } from './components/login';
 
 export class Login {
   readonly page: Page;
   readonly email: Locator;
   readonly password: Locator;
   readonly button: Locator;
+  readonly login: LoginComponent;
 
   constructor(page: Page) {
     this.page = page;
     this.email = page.getByLabel(`Email`);
     this.password = page.getByLabel(`Password`).nth(0);
     this.button = page.locator('button', { hasText: 'Login' });
+    this.login = new LoginComponent(page);
   }
 
    async goto(host: String) {
@@ -30,23 +33,10 @@ export class Login {
   }
 
   async isLoggedIn() {
-    try {
-      await this.page.locator('button', { hasText: 'Log out' }).waitFor({timeout: 1000});
-      return true;
-    } catch {
-      return false;
-    }
+    return await this.login.isLoggedIn();
   }
 
-  async userIsLoggedIn(firstName, lastName) {
-    try {
-      if (await this.isLoggedIn() == false) {
-        return false;
-      }
-      await this.page.getByText(`Welcome ${firstName} ${lastName}`).waitFor({timeout: 1000})
-      return true;
-    } catch {
-      return false;
-    }
+  async isLoggedInAs(firstName, lastName) {
+    return await this.login.isLoggedInAs(firstName, lastName);
   }
 }

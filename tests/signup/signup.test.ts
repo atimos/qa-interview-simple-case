@@ -20,7 +20,7 @@ test.describe('signup form tests', () => {
     await signupPage.enterPassword("newpassword123");
     await signupPage.clickSubmitButton();
 
-    expect(await signupPage.userIsLoggedIn(firstName, lastName)).toBe(true);
+    expect(await signupPage.isLoggedInAs(firstName, lastName)).toBe(true);
   })
 
   test('can login with newly created account', async ({ page }) => {
